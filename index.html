@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Centauro Esporte Clube — Quiz do Dia</title>
+<style>
+  :root{
+    --red:#E30613;
+    --red-dark:#B00510;
+    --black:#111111;
+    --gray-900:#1A1A1A;
+    --gray-700:#4A4A4A;
+    --gray-500:#8A8A8A;
+    --gray-300:#D8D8D8;
+    --gray-100:#F2F2F2;
+    --green:#1E9E5A;
+    --white:#FFFFFF;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    background:#EDEDED;
+    display:flex;
+    justify-content:center;
+    padding:30px 10px;
+  }
+
+  /* ===== PHONE FRAME ===== */
+  .phone{
+    width:375px;
+    height:780px;
+    background:var(--black);
+    border-radius:44px;
+    padding:14px;
+    box-shadow:0 30px 60px rgba(0,0,0,.35);
+    position:relative;
+  }
+  .screen{
+    width:100%;height:100%;
+    background:var(--gray-100);
+    border-radius:32px;
+    overflow:hidden;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .scroll-body{
+    overflow-y:auto;
+    flex:1;
+    -ms-overflow-style:none;
+    scrollbar-width:none;
+  }
+  .scroll-body::-webkit-scrollbar{display:none;}
+  .notch{
+    position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:120px;height:26px;background:var(--black);
+    border-radius:0 0 16px 16px;z-index:50;
+  }
+
+  /* ===== STATUS BAR ===== */
+  .statusbar{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 22px 4px;
+    font-size:13px;font-weight:700;color:var(--black);
+  }
+
+  /* ===== APP HEADER ===== */
+  .app-header{
+    padding:6px 20px 16px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .app-header .greet{font-size:12px;color:var(--gray-500);}
+  .app-header .name{font-size:17px;font-weight:800;color:var(--black);}
+  .avatar{
+    width:38px;height:38px;border-radius:50%;
+    background:var(--red);color:white;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:14px;
+  }
+
+  /* ===== SALDO CARD ===== */
+  .saldo-card{
+    margin:0 20px 18px;
+    background:var(--black);
+    border-radius:18px;
+    padding:18px 20px;
+    color:white;
+    position:relative;
+    overflow:hidden;
+  }
+  .saldo-card::after{
+    content:"";position:absolute;right:-30px;top:-30px;
+    width:120px;height:120px;border-radius:50%;
+    background:var(--red);opacity:.25;
+  }
+  .saldo-label{font-size:11px;color:#bbb;text-transform:uppercase;letter-spacing:.05em;font-weight:700;}
+  .saldo-value{font-size:30px;font-weight:800;margin-top:2px;display:flex;align-items:baseline;gap:6px;}
+  .saldo-value small{font-size:13px;color:#ccc;font-weight:600;}
+
+  /* ===== MISSIONS SECTION ===== */
+  .section-title{
+    padding:0 20px;
+    font-size:14px;font-weight:800;color:var(--black);
+    margin-bottom:10px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .section-title span.link{font-size:11.5px;color:var(--red);font-weight:700;}
+
+  .missions-scroll{
+    display:flex;gap:10px;
+    padding:0 20px 4px;
+    overflow-x:auto;
+  }
+  .missions-scroll::-webkit-scrollbar{display:none;}
+
+  .quiz-card{
+    flex:none;
+    width:210px;
+    background:linear-gradient(135deg,var(--red) 0%, var(--red-dark) 100%);
+    border-radius:16px;
+    padding:16px;
+    color:white;
+    position:relative;
+    cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .quiz-card:active{transform:scale(.97);}
+  .quiz-card .badge{
+    display:inline-flex;align-items:center;gap:4px;
+    background:rgba(255,255,255,.2);
+    border-radius:20px;font-size:10.5px;font-weight:700;
+    padding:3px 9px;margin-bottom:10px;
+  }
+  .quiz-card h4{font-size:15px;margin:0 0 4px;font-weight:800;}
+  .quiz-card p{font-size:11.5px;margin:0 0 12px;color:#ffe3e5;line-height:1.35;}
+  .quiz-card .cta{
+    font-size:12px;font-weight:800;
+    display:flex;align-items:center;gap:5px;
+  }
+  .quiz-card .pts-tag{
+    position:absolute;top:14px;right:14px;
+    background:white;color:var(--red-dark);
+    font-size:11px;font-weight:800;
+    padding:3px 8px;border-radius:20px;
+  }
+  .quiz-card.done{
+    background:linear-gradient(135deg,#3a3a3a,#1f1f1f);
+  }
+  .quiz-card.done .pts-tag{background:var(--green);color:white;}
+
+  .mission-mini{
+    flex:none;width:150px;
+    background:white;border-radius:14px;padding:12px;
+    border:1px solid var(--gray-300);
+  }
+  .mission-mini .emoji{font-size:20px;}
+  .mission-mini h5{font-size:12px;margin:8px 0 2px;font-weight:700;color:var(--black);}
+  .mission-mini .pts{font-size:11px;color:var(--red);font-weight:800;}
+
+  /* ===== PROMO BANNER ===== */
+  .promo-banner{
+    margin:6px 20px 4px;
+    background:linear-gradient(135deg,#1A1A1A,#000);
+    border-radius:16px;
+    padding:16px 18px;
+    display:flex;justify-content:space-between;align-items:center;
+    color:white;
+    position:relative;
+    overflow:hidden;
+  }
+  .promo-tag{
+    font-size:10px;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--red);font-weight:800;margin-bottom:5px;
+  }
+  .promo-text h4{font-size:14.5px;margin:0 0 3px;font-weight:800;max-width:190px;line-height:1.25;}
+  .promo-text p{font-size:11px;margin:0;color:#bbb;}
+  .promo-emoji{font-size:34px;flex:none;margin-left:8px;}
+
+  /* ===== CHALLENGE CARD ===== */
+  .challenge-card{
+    flex:none;width:170px;
+    background:white;border-radius:14px;
+    border:1px solid var(--gray-300);
+    padding:14px;
+  }
+  .challenge-icon{font-size:20px;margin-bottom:6px;}
+  .challenge-card h5{font-size:12.5px;margin:0 0 2px;font-weight:800;color:var(--black);}
+  .challenge-card p{font-size:11px;margin:0 0 10px;color:var(--gray-500);}
+  .challenge-bar{height:6px;background:var(--gray-100);border-radius:5px;overflow:hidden;margin-bottom:8px;}
+  .challenge-fill{height:100%;background:var(--red);border-radius:5px;}
+  .challenge-foot{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;color:var(--gray-500);}
+  .challenge-foot b{color:var(--red);font-size:11px;}
+
+  /* ===== REWARD CARD ===== */
+  .reward-card{
+    flex:none;width:135px;
+    background:white;border-radius:14px;
+    border:1px solid var(--gray-300);
+    padding:0 0 12px;
+    overflow:hidden;
+  }
+  .reward-img{
+    height:70px;background:var(--gray-100);
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px;margin-bottom:10px;
+  }
+  .reward-card h5{font-size:11.5px;margin:0 10px 6px;font-weight:700;color:var(--black);line-height:1.3;min-height:28px;}
+  .reward-pts{margin:0 10px;font-size:11.5px;font-weight:800;color:var(--red);}
+
+  /* ===== PRODUCT CARD ===== */
+  .product-card{
+    flex:none;width:120px;
+    background:white;border-radius:14px;
+    border:1px solid var(--gray-300);
+    padding:0 0 10px;
+    overflow:hidden;
+  }
+  .product-img{
+    height:80px;background:var(--gray-100);
+    display:flex;align-items:center;justify-content:center;
+    font-size:30px;margin-bottom:8px;
+  }
+  .product-card h5{font-size:11px;margin:0 10px 4px;font-weight:700;color:var(--black);line-height:1.3;min-height:26px;}
+  .product-price{margin:0 10px;font-size:11.5px;font-weight:800;color:var(--black);}
+
+  /* ===== FULLSCREEN: TODAS AS MISSÕES ===== */
+  .fullscreen-overlay{
+    position:absolute;inset:0;
+    background:var(--gray-100);
+    z-index:250;
+    display:none;
+    flex-direction:column;
+    border-radius:32px;
+    overflow:hidden;
+  }
+  .fullscreen-overlay.open{display:flex;}
+  .fs-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 18px 14px;
+    background:white;
+    border-bottom:1px solid var(--gray-300);
+  }
+  .fs-header h3{font-size:15px;margin:0;font-weight:800;color:var(--black);}
+  .fs-back{
+    width:30px;height:30px;border-radius:50%;
+    background:var(--gray-100);border:none;
+    font-size:15px;color:var(--black);cursor:pointer;
+  }
+  .fs-body{
+    flex:1;overflow-y:auto;padding:14px 18px 30px;
+    scrollbar-width:none;
+  }
+  .fs-body::-webkit-scrollbar{display:none;}
+  .fs-group-label{
+    font-size:11px;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--gray-500);font-weight:800;
+    margin:18px 0 8px;
+  }
+  .fs-group-label:first-child{margin-top:2px;}
+  .fs-mission-row{
+    display:flex;align-items:center;gap:12px;
+    background:white;border-radius:14px;
+    border:1px solid var(--gray-300);
+    padding:12px 14px;margin-bottom:8px;
+    cursor:pointer;
+  }
+  .fs-emoji{font-size:20px;flex:none;width:26px;text-align:center;}
+  .fs-info{flex:1;}
+  .fs-info h5{font-size:13px;margin:0 0 2px;font-weight:700;color:var(--black);}
+  .fs-info p{font-size:11px;margin:0;color:var(--gray-500);}
+  .fs-pts{font-size:11.5px;font-weight:800;color:var(--red);flex:none;white-space:nowrap;}
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav{
+    margin-top:auto;
+    display:flex;justify-content:space-around;
+    padding:12px 0 20px;
+    background:white;
+    border-top:1px solid var(--gray-300);
+  }
+  .nav-item{
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    font-size:10px;color:var(--gray-500);font-weight:600;
+  }
+  .nav-item.active{color:var(--red);}
+  .nav-item .dot{width:20px;height:20px;}
+
+  /* ===== MODAL / POPUP ===== */
+  .modal-overlay{
+    position:absolute;inset:0;
+    background:rgba(0,0,0,.55);
+    display:none;
+    align-items:flex-end;
+    z-index:300;
+    border-radius:32px;
+    overflow:hidden;
+  }
+  .modal-overlay.open{display:flex;}
+
+  .modal{
+    width:100%;
+    background:white;
+    border-radius:24px 24px 0 0;
+    padding:22px 20px 26px;
+    max-height:88%;
+    display:flex;flex-direction:column;
+    animation:slideUp .28s ease;
+  }
+  @keyframes slideUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+  .modal-handle{
+    width:38px;height:4px;background:var(--gray-300);
+    border-radius:4px;margin:0 auto 16px;
+  }
+
+  .quiz-header{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:4px;
+  }
+  .quiz-header h3{font-size:16px;margin:0;font-weight:800;color:var(--black);}
+  .close-btn{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--gray-100);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;color:var(--gray-700);
+    cursor:pointer;border:none;
+  }
+
+  .progress-row{display:flex;gap:5px;margin:14px 0 18px;}
+  .progress-seg{flex:1;height:5px;border-radius:4px;background:var(--gray-300);}
+  .progress-seg.active{background:var(--red);}
+  .progress-seg.correct{background:var(--green);}
+  .progress-seg.wrong{background:#C4C4C4;}
+
+  .q-count{font-size:11px;color:var(--gray-500);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em;}
+  .q-text{font-size:17px;font-weight:800;color:var(--black);margin-bottom:18px;line-height:1.3;}
+
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .option{
+    border:1.5px solid var(--gray-300);
+    border-radius:12px;
+    padding:13px 16px;
+    font-size:14px;font-weight:600;color:var(--gray-900);
+    cursor:pointer;
+    display:flex;justify-content:space-between;align-items:center;
+    background:white;
+    transition:all .15s ease;
+  }
+  .option:not(.disabled):hover{border-color:var(--red);}
+  .option.correct{background:#E9F8EF;border-color:var(--green);color:#0E6E38;}
+  .option.wrong{background:#FBEAEA;border-color:var(--red);color:var(--red-dark);}
+  .option .icon{font-size:15px;}
+  .option.disabled{cursor:default;}
+
+  .feedback-tag{
+    margin-top:14px;
+    font-size:12.5px;font-weight:700;
+    padding:10px 12px;border-radius:10px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .feedback-tag.correct{background:#E9F8EF;color:#0E6E38;}
+  .feedback-tag.wrong{background:#FBEAEA;color:var(--red-dark);}
+
+  .next-btn{
+    margin-top:18px;
+    background:var(--black);
+    color:white;border:none;border-radius:12px;
+    padding:15px;font-size:14px;font-weight:800;
+    cursor:pointer;
+  }
+  .next-btn:disabled{background:var(--gray-300);color:var(--gray-500);}
+
+  /* REDEEM MODAL CONTENT */
+  .redeem-emoji{font-size:44px;text-align:center;margin:6px 0 10px;}
+  .redeem-title{font-size:17px;font-weight:800;color:var(--black);text-align:center;margin-bottom:4px;line-height:1.3;}
+  .redeem-partner{
+    font-size:11px;font-weight:800;color:var(--red);text-align:center;
+    margin-bottom:10px;text-transform:uppercase;letter-spacing:.03em;
+  }
+  .redeem-desc{font-size:12.5px;color:var(--gray-700);text-align:center;line-height:1.4;margin-bottom:16px;}
+  .redeem-cost-row{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--gray-100);border-radius:12px;
+    padding:12px 14px;margin-bottom:8px;
+    font-size:13px;color:var(--gray-700);
+  }
+  .redeem-cost-row b{color:var(--black);font-size:14px;}
+  .redeem-missing{
+    text-align:center;font-size:11.5px;color:var(--gray-500);
+    margin-top:8px;
+  }
+
+  /* FS CHALLENGES LIST */
+  .fs-challenge-row{
+    background:white;border-radius:14px;
+    border:1px solid var(--gray-300);
+    padding:14px;margin-bottom:10px;
+  }
+  .fs-challenge-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .fs-challenge-icon{font-size:20px;flex:none;}
+  .fs-challenge-info{flex:1;}
+  .fs-challenge-info h5{font-size:13px;margin:0 0 2px;font-weight:700;color:var(--black);}
+  .fs-challenge-info p{font-size:11px;margin:0;color:var(--gray-500);}
+
+  /* CART SCREEN */
+  .cart-item{
+    display:flex;align-items:center;gap:12px;
+    background:white;border-radius:14px;
+    border:1px solid var(--gray-300);
+    padding:12px;margin-bottom:10px;
+  }
+  .cart-item-img{
+    width:48px;height:48px;border-radius:10px;
+    background:var(--gray-100);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;flex:none;
+  }
+  .cart-item-info{flex:1;}
+  .cart-item-info h5{font-size:12.5px;margin:0 0 2px;font-weight:700;color:var(--black);}
+  .cart-item-info span{font-size:11px;color:var(--gray-500);}
+  .cart-item-price{font-size:12.5px;font-weight:800;color:var(--black);flex:none;}
+
+  .cart-summary{
+    background:white;border-radius:14px;
+    border:1px solid var(--gray-300);
+    padding:14px;margin-top:14px;
+  }
+  .cart-summary-row{
+    display:flex;justify-content:space-between;
+    font-size:12.5px;color:var(--gray-700);
+    padding:6px 0;
+  }
+  .cart-summary-row.discount{color:var(--green);font-weight:700;}
+  .cart-summary-row.total{
+    border-top:1px solid var(--gray-300);
+    margin-top:6px;padding-top:10px;
+    font-weight:800;color:var(--black);font-size:14px;
+  }
+
+  .spoints-toggle-box{
+    display:flex;justify-content:space-between;align-items:center;
+    background:#FFF5F5;border:1px solid #F6C7C9;
+    border-radius:14px;padding:13px 14px;margin:14px 0;
+  }
+  .spoints-toggle-text h5{font-size:12.5px;margin:0 0 2px;font-weight:800;color:var(--black);}
+  .spoints-toggle-text p{font-size:10.5px;margin:0;color:var(--gray-500);}
+  .toggle-switch{
+    width:46px;height:26px;border-radius:20px;
+    background:var(--gray-300);position:relative;
+    flex:none;cursor:pointer;transition:background .2s ease;
+  }
+  .toggle-switch.on{background:var(--red);}
+  .toggle-knob{
+    position:absolute;top:3px;left:3px;
+    width:20px;height:20px;border-radius:50%;
+    background:white;box-shadow:0 1px 3px rgba(0,0,0,.3);
+    transition:left .2s ease;
+  }
+  .toggle-switch.on .toggle-knob{left:23px;}
+
+  .checkout-btn{
+    width:100%;margin-top:6px;
+    background:var(--black);color:white;border:none;border-radius:12px;
+    padding:15px;font-size:14px;font-weight:800;
+    cursor:pointer;
+  }
+
+  /* RESULT SCREEN */
+  .result-wrap{text-align:center;padding:10px 6px 4px;}
+  .result-emoji{font-size:48px;margin-bottom:6px;}
+  .result-title{font-size:19px;font-weight:800;color:var(--black);margin-bottom:6px;}
+  .result-sub{font-size:13px;color:var(--gray-700);margin-bottom:20px;line-height:1.4;}
+  .points-breakdown{
+    background:var(--gray-100);
+    border-radius:14px;
+    padding:16px 18px;
+    text-align:left;
+    margin-bottom:18px;
+  }
+  .pb-row{
+    display:flex;justify-content:space-between;
+    font-size:13px;color:var(--gray-700);
+    padding:6px 0;
+  }
+  .pb-row.total{
+    border-top:1px solid var(--gray-300);
+    margin-top:6px;padding-top:10px;
+    font-weight:800;color:var(--black);font-size:14px;
+  }
+  .pb-row b{color:var(--red);}
+  .result-total{
+    background:var(--red);color:white;
+    border-radius:16px;padding:16px;
+    font-size:26px;font-weight:800;
+    margin-bottom:18px;
+  }
+  .result-total small{font-size:12px;font-weight:600;display:block;color:#ffdcdf;margin-top:2px;}
+
+  .coin-banner{
+    display:flex;align-items:center;gap:12px;
+    background:linear-gradient(135deg,#FFF6DA,#FFE9A8);
+    border:1px solid #F0D48A;
+    border-radius:14px;padding:14px;margin-bottom:16px;
+    text-align:left;
+  }
+  .coin-emoji{font-size:32px;flex:none;animation:coinPop .5s ease;}
+  @keyframes coinPop{0%{transform:scale(0.4) rotate(-15deg);opacity:0;}60%{transform:scale(1.15) rotate(8deg);opacity:1;}100%{transform:scale(1) rotate(0);}}
+  .coin-text{font-size:12.5px;color:#7A5B00;line-height:1.4;}
+  .coin-text b{font-size:14px;color:#8A6400;}
+
+  .toast{
+    position:absolute;top:70px;left:50%;
+    transform:translateX(-50%) translateY(-20px);
+    background:var(--black);color:white;
+    padding:10px 18px;border-radius:30px;
+    font-size:12.5px;font-weight:700;
+    display:flex;align-items:center;gap:6px;
+    opacity:0;transition:all .3s ease;
+    z-index:300;pointer-events:none;
+    white-space:nowrap;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ===== STORE OFFERS POPUP ===== */
+  .offers-overlay{
+    position:absolute;inset:0;
+    background:rgba(0,0,0,.55);
+    display:none;
+    align-items:center;justify-content:center;
+    z-index:320;
+    border-radius:32px;
+    overflow:hidden;
+    padding:20px;
+  }
+  .offers-overlay.open{display:flex;}
+  .offers-modal{
+    width:100%;
+    background:#FFFBF5;
+    border-radius:18px;
+    padding:20px 18px 16px;
+    position:relative;
+    animation:popIn .3s ease;
+    box-shadow:0 20px 40px rgba(0,0,0,.25);
+  }
+  @keyframes popIn{from{transform:scale(.92);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .offers-close{
+    position:absolute;top:14px;right:14px;
+    width:26px;height:26px;border-radius:50%;
+    background:rgba(0,0,0,.06);border:none;
+    font-size:14px;color:var(--gray-700);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .offers-brand{
+    font-size:13px;font-weight:800;font-style:italic;
+    color:var(--red);letter-spacing:.02em;margin-bottom:10px;
+  }
+  .offers-title{font-size:15px;font-weight:800;color:var(--black);margin-bottom:4px;}
+  .offers-sub{font-size:11px;color:var(--gray-500);margin-bottom:14px;line-height:1.4;}
+  .offers-grid{
+    display:grid;grid-template-columns:1fr 1fr;
+    gap:10px;margin-bottom:12px;
+  }
+  .offer-box{
+    border:1.5px dashed #E8B4B8;
+    border-radius:12px;
+    padding:10px 11px;
+    background:white;
+  }
+  .offer-tag{
+    display:inline-block;
+    background:var(--red);color:white;
+    font-size:9px;font-weight:800;
+    padding:2px 8px;border-radius:10px;
+    margin-bottom:7px;letter-spacing:.02em;
+  }
+  .offer-box h6{font-size:12px;margin:0 0 3px;font-weight:800;color:var(--black);}
+  .offer-box p{font-size:9.5px;margin:0 0 6px;color:var(--gray-500);line-height:1.3;}
+  .offer-price{font-size:14px;font-weight:800;color:var(--red);}
+  .offers-foot{font-size:9.5px;color:var(--gray-500);text-align:center;font-style:italic;}
+
+  /* caption below phone */
+  .caption{
+    max-width:375px;margin:22px auto 0;
+    font-size:12.5px;color:#666;text-align:center;line-height:1.5;
+  }
+  .caption b{color:#222;}
+</style>
+</head>
+<body>
+
+<div>
+<div class="phone">
+  <div class="notch"></div>
+  <div class="screen" id="screen">
+
+    <div class="statusbar">
+      <span>9:41</span>
+      <span>●●●●  🔋</span>
+    </div>
+
+    <div class="app-header">
+      <div>
+        <div class="greet">Boa tarde 👋</div>
+        <div class="name">Guilherme</div>
+      </div>
+      <div class="avatar">G</div>
+    </div>
+
+    <div class="scroll-body">
+
+    <div class="saldo-card">
+      <div class="saldo-label">Seu saldo</div>
+      <div class="saldo-value">🔥 <span id="saldoValue">1980</span> <small>pontos</small></div>
+    </div>
+
+    <div class="section-title">Missões de hoje <span class="link" onclick="openMissionsScreen()" style="cursor:pointer;">ver todas</span></div>
+    <div class="missions-scroll">
+      <div class="quiz-card" id="quizCard" onclick="openQuiz()">
+        <div class="pts-tag" id="quizPtsTag">até 5 pts</div>
+        <div class="badge">🧠 novo · diário</div>
+        <h4>Quiz do dia</h4>
+        <p>4 perguntas rápidas sobre corrida. Erre tudo e ainda garante ponto.</p>
+        <div class="cta">Responder agora →</div>
+      </div>
+
+      <div class="mission-mini" onclick="openCart()" style="cursor:pointer;">
+        <div class="emoji">🛒</div>
+        <h5>Resgate seu carrinho abandonado</h5>
+        <div class="pts">+5 pts</div>
+      </div>
+
+      <div class="mission-mini">
+        <div class="emoji">⭐</div>
+        <h5>Avalie sua última compra</h5>
+        <div class="pts">+3 pts</div>
+      </div>
+
+      <div class="mission-mini">
+        <div class="emoji">💝</div>
+        <h5>Monte sua primeira wishlist</h5>
+        <div class="pts">+3 pts</div>
+      </div>
+
+      <div class="mission-mini">
+        <div class="emoji">⌚</div>
+        <h5>Vincule seu Strava ou Garmin</h5>
+        <div class="pts">+8 pts</div>
+      </div>
+
+      <div class="mission-mini">
+        <div class="emoji">📸</div>
+        <h5>Complete seu perfil com foto</h5>
+        <div class="pts">+2 pts</div>
+      </div>
+
+      <div class="mission-mini">
+        <div class="emoji">👟</div>
+        <h5>Informe sua numeração de tênis</h5>
+        <div class="pts">+2 pts</div>
+      </div>
+
+      <div class="mission-mini">
+        <div class="emoji">🔔</div>
+        <h5>Ative as notificações do app</h5>
+        <div class="pts">+2 pts</div>
+      </div>
+
+      <div class="mission-mini">
+        <div class="emoji">🤝</div>
+        <h5>Convide um amigo pro clube</h5>
+        <div class="pts">+5 pts</div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:22px;">Sua semana</div>
+    <div class="missions-scroll">
+      <div class="mission-mini" style="width:335px;display:flex;align-items:center;gap:12px;">
+        <div class="emoji">🏃</div>
+        <div>
+          <h5 style="margin-bottom:2px;">18,4 km corridos</h5>
+          <div class="pts">+12,9 pts essa semana</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="promo-banner">
+      <div class="promo-text">
+        <div class="promo-tag">campanha da semana</div>
+        <h4>2x pontos comprando pelo app</h4>
+        <p>Válido até domingo, em toda a linha corrida</p>
+      </div>
+      <div class="promo-emoji">🏃‍♀️</div>
+    </div>
+
+    <div class="section-title" style="margin-top:22px;">Desafios em destaque <span class="link" onclick="openChallengesScreen()" style="cursor:pointer;">ver todos</span></div>
+    <div class="missions-scroll">
+      <div class="challenge-card">
+        <div class="challenge-icon">🏁</div>
+        <h5>Corrida acumulada</h5>
+        <p>120km em 30 dias</p>
+        <div class="challenge-bar"><div class="challenge-fill" style="width:62%;"></div></div>
+        <div class="challenge-foot"><span>74,4 / 120 km</span><b>+100 pts</b></div>
+      </div>
+      <div class="challenge-card">
+        <div class="challenge-icon">🚴</div>
+        <h5>Pedal acumulado</h5>
+        <p>300km em 30 dias</p>
+        <div class="challenge-bar"><div class="challenge-fill" style="width:28%;"></div></div>
+        <div class="challenge-foot"><span>84 / 300 km</span><b>+100 pts</b></div>
+      </div>
+      <div class="challenge-card">
+        <div class="challenge-icon">🌅</div>
+        <h5>Longão de fim de semana</h5>
+        <p>Corra no sábado ou domingo</p>
+        <div class="challenge-bar"><div class="challenge-fill" style="width:0%;"></div></div>
+        <div class="challenge-foot"><span>Ainda não iniciado</span><b>+10 pts</b></div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:22px;">Resgate com seus pontos <span class="link" onclick="openRewardsScreen()" style="cursor:pointer;">ver tudo</span></div>
+    <div class="missions-scroll">
+      <div class="reward-card" onclick="openRedeem('c1')">
+        <div class="reward-img">🎫</div>
+        <h5>Cupom de R$ 6 na próxima compra</h5>
+        <div class="reward-pts">300 pts</div>
+      </div>
+      <div class="reward-card" onclick="openRedeem('c2')">
+        <div class="reward-img">🎫</div>
+        <h5>Cupom de R$ 16 na próxima compra</h5>
+        <div class="reward-pts">750 pts</div>
+      </div>
+      <div class="reward-card" onclick="openRedeem('c3')">
+        <div class="reward-img">🎫</div>
+        <h5>Cupom de R$ 26 na próxima compra</h5>
+        <div class="reward-pts">1.150 pts</div>
+      </div>
+      <div class="reward-card" onclick="openRedeem('p1')">
+        <div class="reward-img">👟</div>
+        <h5>20% OFF em produtos Nike</h5>
+        <div class="reward-pts">400 pts</div>
+      </div>
+      <div class="reward-card" onclick="openRedeem('p2')">
+        <div class="reward-img">🏠</div>
+        <h5>8% OFF em reservas Airbnb</h5>
+        <div class="reward-pts">600 pts</div>
+      </div>
+      <div class="reward-card" onclick="openRedeem('p3')">
+        <div class="reward-img">🏋️</div>
+        <h5>Treino exclusivo Nike</h5>
+        <div class="reward-pts">800 pts</div>
+      </div>
+      <div class="reward-card" onclick="openRedeem('p4')">
+        <div class="reward-img">🏎️</div>
+        <h5>30% OFF ingresso F1</h5>
+        <div class="reward-pts">1.500 pts</div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:22px;">Recomendados pra você</div>
+    <div class="missions-scroll" style="padding-bottom:18px;">
+      <div class="product-card">
+        <div class="product-img">👟</div>
+        <h5>Tênis Corrida Pro Air</h5>
+        <div class="product-price">R$ 399,90</div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">🩳</div>
+        <h5>Short Performance UV</h5>
+        <div class="product-price">R$ 129,90</div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">🧢</div>
+        <h5>Boné Dry Running</h5>
+        <div class="product-price">R$ 79,90</div>
+      </div>
+    </div>
+
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active"><div class="dot">🏠</div>Início</div>
+      <div class="nav-item"><div class="dot">🏆</div>Desafios</div>
+      <div class="nav-item"><div class="dot">🎁</div>Resgatar</div>
+      <div class="nav-item"><div class="dot">👤</div>Perfil</div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">+1 ponto 🎉</div>
+
+    <!-- TELA: TODAS AS MISSÕES -->
+    <div class="fullscreen-overlay" id="missionsScreen">
+      <div class="fs-header">
+        <button class="fs-back" onclick="closeMissionsScreen()">←</button>
+        <h3>Todas as missões</h3>
+        <div style="width:26px;"></div>
+      </div>
+      <div class="fs-body">
+        <div class="fs-group-label">Diária</div>
+        <div class="fs-mission-row" onclick="openQuiz()">
+          <div class="fs-emoji">🧠</div>
+          <div class="fs-info"><h5>Quiz do dia</h5><p>4 perguntas rápidas · bônus garantido</p></div>
+          <div class="fs-pts">até 5 pts</div>
+        </div>
+
+        <div class="fs-group-label">Ativação (uma vez)</div>
+        <div class="fs-mission-row" onclick="openCart()">
+          <div class="fs-emoji">🛒</div>
+          <div class="fs-info"><h5>Resgate seu carrinho abandonado</h5><p>Finalize uma compra que ficou parada</p></div>
+          <div class="fs-pts">+5 pts</div>
+        </div>
+        <div class="fs-mission-row">
+          <div class="fs-emoji">⭐</div>
+          <div class="fs-info"><h5>Avalie sua última compra</h5><p>Texto +3 · com foto +5 · com vídeo +10</p></div>
+          <div class="fs-pts">até +10 pts</div>
+        </div>
+        <div class="fs-mission-row">
+          <div class="fs-emoji">💝</div>
+          <div class="fs-info"><h5>Monte sua primeira wishlist</h5><p>Favorite ao menos 3 produtos</p></div>
+          <div class="fs-pts">+3 pts</div>
+        </div>
+        <div class="fs-mission-row">
+          <div class="fs-emoji">⌚</div>
+          <div class="fs-info"><h5>Vincule seu Strava ou Garmin</h5><p>Sincronize seus treinos automaticamente</p></div>
+          <div class="fs-pts">+8 pts</div>
+        </div>
+        <div class="fs-mission-row">
+          <div class="fs-emoji">📸</div>
+          <div class="fs-info"><h5>Complete seu perfil com foto</h5><p>Deixe seu perfil completo</p></div>
+          <div class="fs-pts">+2 pts</div>
+        </div>
+        <div class="fs-mission-row">
+          <div class="fs-emoji">👟</div>
+          <div class="fs-info"><h5>Informe sua numeração de tênis</h5><p>Recomendações mais precisas pra você</p></div>
+          <div class="fs-pts">+2 pts</div>
+        </div>
+        <div class="fs-mission-row">
+          <div class="fs-emoji">🔔</div>
+          <div class="fs-info"><h5>Ative as notificações do app</h5><p>Não perca nenhuma missão nova</p></div>
+          <div class="fs-pts">+2 pts</div>
+        </div>
+        <div class="fs-mission-row">
+          <div class="fs-emoji">🤝</div>
+          <div class="fs-info"><h5>Convide um amigo pro clube</h5><p>Você ganha quando ele se cadastra</p></div>
+          <div class="fs-pts">+5 pts</div>
+        </div>
+
+        <div class="fs-group-label">Recorrente</div>
+        <div class="fs-mission-row">
+          <div class="fs-emoji">✅</div>
+          <div class="fs-info"><h5>Check-in semanal</h5><p>Marcos a cada poucos dias, até completar a semana</p></div>
+          <div class="fs-pts">+7 pts</div>
+        </div>
+        <div class="fs-mission-row">
+          <div class="fs-emoji">🏆</div>
+          <div class="fs-info"><h5>Primeiro desafio em grupo</h5><p>Participe de um desafio coletivo</p></div>
+          <div class="fs-pts">+10 pts</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STORE OFFERS POPUP -->
+    <div class="offers-overlay" id="offersOverlay">
+      <div class="offers-modal">
+        <button class="offers-close" onclick="closeOffers()">✕</button>
+        <div class="offers-brand">« CENTAURO</div>
+        <div class="offers-title">Ofertas da loja · só pra você</div>
+        <div class="offers-sub">Desbloqueado ao fazer check-in ou se identificar com o vendedor</div>
+        <div class="offers-grid">
+          <div class="offer-box">
+            <div class="offer-tag">HOJE</div>
+            <h6>Tênis de corrida</h6>
+            <p>Linha performance, últimos pares</p>
+            <div class="offer-price">30% OFF</div>
+          </div>
+          <div class="offer-box">
+            <div class="offer-tag">EXCLUSIVO</div>
+            <h6>Meia de compressão</h6>
+            <p>Leve 3, pague 2</p>
+            <div class="offer-price">-33%</div>
+          </div>
+          <div class="offer-box">
+            <div class="offer-tag">RELÂMPAGO</div>
+            <h6>Garrafa térmica</h6>
+            <p>Só até o fim do dia</p>
+            <div class="offer-price">R$ 39,90</div>
+          </div>
+          <div class="offer-box">
+            <div class="offer-tag">MEMBRO</div>
+            <h6>Assessoria esportiva</h6>
+            <p>1ª mensalidade</p>
+            <div class="offer-price">-50%</div>
+          </div>
+        </div>
+        <div class="offers-foot">Ofertas válidas só nesta loja, hoje. Volte amanhã pra ver o que muda.</div>
+      </div>
+    </div>
+
+    <!-- TELA: TODAS AS RECOMPENSAS -->
+    <div class="fullscreen-overlay" id="rewardsScreen">
+      <div class="fs-header">
+        <button class="fs-back" onclick="closeRewardsScreen()">←</button>
+        <h3>Todas as recompensas</h3>
+        <div style="width:26px;"></div>
+      </div>
+      <div class="fs-body">
+        <div class="fs-group-label">Cupons Centauro</div>
+        <div class="fs-mission-row" onclick="openRedeem('c1')">
+          <div class="fs-emoji">🎫</div>
+          <div class="fs-info"><h5>Cupom de R$ 6 na próxima compra</h5><p>Válido em qualquer loja ou app</p></div>
+          <div class="fs-pts">300 pts</div>
+        </div>
+        <div class="fs-mission-row" onclick="openRedeem('c2')">
+          <div class="fs-emoji">🎫</div>
+          <div class="fs-info"><h5>Cupom de R$ 16 na próxima compra</h5><p>Válido em qualquer loja ou app</p></div>
+          <div class="fs-pts">750 pts</div>
+        </div>
+        <div class="fs-mission-row" onclick="openRedeem('c3')">
+          <div class="fs-emoji">🎫</div>
+          <div class="fs-info"><h5>Cupom de R$ 26 na próxima compra</h5><p>Válido em qualquer loja ou app</p></div>
+          <div class="fs-pts">1.150 pts</div>
+        </div>
+
+        <div class="fs-group-label">Parceiros</div>
+        <div class="fs-mission-row" onclick="openRedeem('p1')">
+          <div class="fs-emoji">👟</div>
+          <div class="fs-info"><h5>20% OFF em produtos Nike</h5><p>Válido no site e lojas Nike participantes</p></div>
+          <div class="fs-pts">400 pts</div>
+        </div>
+        <div class="fs-mission-row" onclick="openRedeem('p2')">
+          <div class="fs-emoji">🏠</div>
+          <div class="fs-info"><h5>8% OFF em reservas Airbnb</h5><p>Válido para novas reservas</p></div>
+          <div class="fs-pts">600 pts</div>
+        </div>
+        <div class="fs-mission-row" onclick="openRedeem('p3')">
+          <div class="fs-emoji">🏋️</div>
+          <div class="fs-info"><h5>Treino exclusivo Nike</h5><p>Sessão com treinador Nike Run Club</p></div>
+          <div class="fs-pts">800 pts</div>
+        </div>
+        <div class="fs-mission-row" onclick="openRedeem('p4')">
+          <div class="fs-emoji">🏎️</div>
+          <div class="fs-info"><h5>30% OFF ingresso F1</h5><p>GP de São Paulo, lote promocional</p></div>
+          <div class="fs-pts">1.500 pts</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REDEEM MODAL -->
+    <div class="modal-overlay" id="redeemOverlay">
+      <div class="modal" id="redeemModalContent"></div>
+    </div>
+
+    <!-- TELA: TODOS OS DESAFIOS -->
+    <div class="fullscreen-overlay" id="challengesScreen">
+      <div class="fs-header">
+        <button class="fs-back" onclick="closeChallengesScreen()">←</button>
+        <h3>Todos os desafios</h3>
+        <div style="width:26px;"></div>
+      </div>
+      <div class="fs-body">
+        <div class="fs-challenge-row">
+          <div class="fs-challenge-top">
+            <div class="fs-challenge-icon">🏁</div>
+            <div class="fs-challenge-info"><h5>Corrida acumulada</h5><p>120km em 30 dias</p></div>
+            <div class="fs-pts">+100 pts</div>
+          </div>
+          <div class="challenge-bar"><div class="challenge-fill" style="width:62%;"></div></div>
+          <div class="challenge-foot"><span>74,4 / 120 km</span><b>62%</b></div>
+        </div>
+        <div class="fs-challenge-row">
+          <div class="fs-challenge-top">
+            <div class="fs-challenge-icon">🚴</div>
+            <div class="fs-challenge-info"><h5>Pedal acumulado</h5><p>300km em 30 dias</p></div>
+            <div class="fs-pts">+100 pts</div>
+          </div>
+          <div class="challenge-bar"><div class="challenge-fill" style="width:28%;"></div></div>
+          <div class="challenge-foot"><span>84 / 300 km</span><b>28%</b></div>
+        </div>
+        <div class="fs-challenge-row">
+          <div class="fs-challenge-top">
+            <div class="fs-challenge-icon">🌅</div>
+            <div class="fs-challenge-info"><h5>Longão de fim de semana</h5><p>Corra no sábado ou domingo</p></div>
+            <div class="fs-pts">+10 pts</div>
+          </div>
+          <div class="challenge-bar"><div class="challenge-fill" style="width:0%;"></div></div>
+          <div class="challenge-foot"><span>Ainda não iniciado</span><b>0%</b></div>
+        </div>
+        <div class="fs-challenge-row">
+          <div class="fs-challenge-top">
+            <div class="fs-challenge-icon">🏊</div>
+            <div class="fs-challenge-info"><h5>Natação semanal</h5><p>3 treinos essa semana</p></div>
+            <div class="fs-pts">+40 pts</div>
+          </div>
+          <div class="challenge-bar"><div class="challenge-fill" style="width:33%;"></div></div>
+          <div class="challenge-foot"><span>1 / 3 treinos</span><b>33%</b></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TELA: CARRINHO -->
+    <div class="fullscreen-overlay" id="cartScreen">
+      <div class="fs-header">
+        <button class="fs-back" onclick="closeCart()">←</button>
+        <h3>Seu carrinho</h3>
+        <div style="width:26px;"></div>
+      </div>
+      <div class="fs-body" id="cartBody"></div>
+    </div>
+
+    <!-- CHECKOUT RESULT MODAL -->
+    <div class="modal-overlay" id="checkoutOverlay">
+      <div class="modal" id="checkoutModalContent"></div>
+    </div>
+
+    <!-- QUIZ MODAL -->
+    <div class="modal-overlay" id="quizOverlay">
+      <div class="modal" id="modalContent">
+        <!-- injected by JS -->
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<div class="caption">
+  <b>Simulação — Centauro Esporte Clube.</b><br>
+  Toque no card vermelho "Quiz do dia" para abrir o pop-up. Regra: +1 pt por resposta certa (4 perguntas) + 1 pt de bônus garantido por completar, mesmo errando tudo.
+</div>
+
+<script>
+const questions = [
+  {
+    q: "Qual é a distância oficial de uma maratona?",
+    options: ["42,195 km", "40 km", "35 km", "50 km"],
+    correct: 0
+  },
+  {
+    q: "O que é o 'shin splint', comum entre corredores?",
+    options: [
+      "Uma dor lombar",
+      "Inflamação na canela",
+      "Lesão no ombro",
+      "Cãibra no pé"
+    ],
+    correct: 1
+  },
+  {
+    q: "Qual tênis é mais indicado para pisada pronada?",
+    options: [
+      "Neutro leve",
+      "Minimalista",
+      "Com suporte de estabilidade",
+      "Sem amortecimento"
+    ],
+    correct: 2
+  },
+  {
+    q: "Quantos dias de descanso são recomendados por semana pra quem corre 5x?",
+    options: ["0 dias", "1 a 2 dias", "4 dias", "Não precisa descansar"],
+    correct: 1
+  }
+];
+
+let current = 0;
+let correctCount = 0;
+let answered = false;
+let quizDone = false;
+
+function openMissionsScreen(){
+  document.getElementById('missionsScreen').classList.add('open');
+}
+function closeMissionsScreen(){
+  document.getElementById('missionsScreen').classList.remove('open');
+}
+
+function openQuiz(){
+  if(quizDone){
+    showToast("Você já completou o quiz de hoje ✅");
+    return;
+  }
+  current = 0;
+  correctCount = 0;
+  answered = false;
+  document.getElementById('quizOverlay').classList.add('open');
+  renderQuestion();
+}
+
+function closeQuiz(){
+  document.getElementById('quizOverlay').classList.remove('open');
+}
+
+function progressHTML(){
+  let html = '<div class="progress-row">';
+  for(let i=0;i<questions.length;i++){
+    let cls = 'progress-seg';
+    if(i < current) cls += answeredStates[i] ? ' correct' : ' wrong';
+    else if(i === current) cls += ' active';
+    html += `<div class="${cls}"></div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+let answeredStates = [];
+
+function renderQuestion(){
+  answered = false;
+  const item = questions[current];
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="quiz-header">
+      <h3>🧠 Quiz do dia</h3>
+      <button class="close-btn" onclick="closeQuiz()">✕</button>
+    </div>
+    ${progressHTML()}
+    <div class="q-count">Pergunta ${current+1} de ${questions.length}</div>
+    <div class="q-text">${item.q}</div>
+    <div class="options" id="optionsWrap">
+      ${item.options.map((opt,i)=>`<div class="option" data-i="${i}" onclick="selectOption(${i})"><span>${opt}</span></div>`).join('')}
+    </div>
+    <div id="feedbackArea"></div>
+    <button class="next-btn" id="nextBtn" disabled onclick="nextQuestion()">
+      ${current === questions.length-1 ? 'Ver resultado' : 'Próxima pergunta'}
+    </button>
+  `;
+}
+
+function selectOption(i){
+  if(answered) return;
+  answered = true;
+  const item = questions[current];
+  const isCorrect = i === item.correct;
+  answeredStates[current] = isCorrect;
+  if(isCorrect) correctCount++;
+
+  const opts = document.querySelectorAll('#optionsWrap .option');
+  opts.forEach((el,idx)=>{
+    el.classList.add('disabled');
+    if(idx === item.correct) el.classList.add('correct');
+    if(idx === i && i !== item.correct) el.classList.add('wrong');
+    if(idx === item.correct) el.innerHTML = `<span>${item.options[idx]}</span><span class="icon">✅</span>`;
+    if(idx === i && i !== item.correct) el.innerHTML = `<span>${item.options[idx]}</span><span class="icon">❌</span>`;
+  });
+
+  const fb = document.getElementById('feedbackArea');
+  fb.innerHTML = isCorrect
+    ? `<div class="feedback-tag correct">✅ Certa! +1 ponto garantido nessa pergunta.</div>`
+    : `<div class="feedback-tag wrong">❌ Essa não era — mas segue no quiz, o ponto de participação continua garantido.</div>`;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function nextQuestion(){
+  if(current < questions.length - 1){
+    current++;
+    renderQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+function finishQuiz(){
+  quizDone = true;
+  const completionBonus = 1;
+  const total = correctCount + completionBonus;
+
+  const modal = document.getElementById('modalContent');
+  let title, emoji, sub;
+  if(correctCount === questions.length){
+    emoji = "🏆"; title = "Gabaritou!"; sub = "Você acertou todas as perguntas de hoje. Volta amanhã pra um novo quiz.";
+  } else if(correctCount === 0){
+    emoji = "💪"; title = "Quiz completo!"; sub = "Não acertou nenhuma essa vez, mas o ponto de participação é seu — volta amanhã pra tentar de novo.";
+  } else {
+    emoji = "🙌"; title = "Quiz completo!"; sub = "Bom trabalho — parte dos pontos veio dos acertos, parte só por completar.";
+  }
+
+  modal.innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="quiz-header">
+      <h3>Resultado</h3>
+      <button class="close-btn" onclick="closeQuiz()">✕</button>
+    </div>
+    <div class="result-wrap">
+      <div class="result-emoji">${emoji}</div>
+      <div class="result-title">${title}</div>
+      <div class="result-sub">${sub}</div>
+
+      <div class="points-breakdown">
+        <div class="pb-row"><span>Respostas certas (${correctCount}/${questions.length})</span><b>+${correctCount} pt${correctCount===1?'':'s'}</b></div>
+        <div class="pb-row"><span>Bônus por completar o quiz</span><b>+${completionBonus} pt</b></div>
+        <div class="pb-row total"><span>Total ganho hoje</span><span>+${total} pts</span></div>
+      </div>
+
+      <div class="result-total">
+        +${total} pontos
+        <small>creditados no seu saldo agora</small>
+      </div>
+    </div>
+    <button class="next-btn" onclick="closeAndCredit(${total})">Voltar ao início</button>
+  `;
+}
+
+function closeAndCredit(total){
+  const saldoEl = document.getElementById('saldoValue');
+  const current = parseInt(saldoEl.textContent, 10);
+  saldoEl.textContent = current + total;
+
+  const card = document.getElementById('quizCard');
+  card.classList.add('done');
+  card.querySelector('.badge').innerHTML = '✅ concluído hoje';
+  card.querySelector('h4').textContent = 'Quiz do dia';
+  card.querySelector('p').textContent = `Você ganhou +${total} pts hoje. Volta amanhã pra um novo quiz.`;
+  card.querySelector('.cta').textContent = 'Ver respostas →';
+  document.getElementById('quizPtsTag').textContent = `+${total} pts`;
+
+  closeQuiz();
+  showToast(`+${total} pontos creditados 🎉`);
+}
+
+function openOffers(){
+  document.getElementById('offersOverlay').classList.add('open');
+}
+function closeOffers(){
+  document.getElementById('offersOverlay').classList.remove('open');
+}
+setTimeout(openOffers, 5000);
+
+const rewards = {
+  c1: {emoji:"🎫", title:"Cupom de R$ 6 na próxima compra", desc:"Válido em qualquer loja ou app Centauro, sem valor mínimo.", pts:300, partner:false},
+  c2: {emoji:"🎫", title:"Cupom de R$ 16 na próxima compra", desc:"Válido em qualquer loja ou app Centauro, sem valor mínimo.", pts:750, partner:false},
+  c3: {emoji:"🎫", title:"Cupom de R$ 26 na próxima compra", desc:"Válido em qualquer loja ou app Centauro, sem valor mínimo.", pts:1150, partner:false},
+  p1: {emoji:"👟", title:"20% OFF em produtos Nike", desc:"Desconto válido no site e lojas Nike participantes.", pts:400, partner:true, partnerName:"Nike"},
+  p2: {emoji:"🏠", title:"8% OFF em reservas Airbnb", desc:"Válido para novas reservas feitas em até 90 dias.", pts:600, partner:true, partnerName:"Airbnb"},
+  p3: {emoji:"🏋️", title:"Treino exclusivo Nike", desc:"Sessão exclusiva com treinador Nike Run Club, vagas limitadas.", pts:800, partner:true, partnerName:"Nike"},
+  p4: {emoji:"🏎️", title:"30% OFF ingresso F1", desc:"Desconto no lote promocional do GP de São Paulo.", pts:1500, partner:true, partnerName:"Formula 1"},
+};
+
+function openRewardsScreen(){
+  document.getElementById('rewardsScreen').classList.add('open');
+}
+function closeRewardsScreen(){
+  document.getElementById('rewardsScreen').classList.remove('open');
+}
+
+let currentRedeemId = null;
+
+function openRedeem(id){
+  currentRedeemId = id;
+  const r = rewards[id];
+  const saldo = parseInt(document.getElementById('saldoValue').textContent, 10);
+  const enough = saldo >= r.pts;
+
+  const modal = document.getElementById('redeemModalContent');
+  modal.innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="quiz-header">
+      <h3>${r.partner ? 'Recompensa parceiro' : 'Recompensa Centauro'}</h3>
+      <button class="close-btn" onclick="closeRedeem()">✕</button>
+    </div>
+    <div class="redeem-emoji">${r.emoji}</div>
+    <div class="redeem-title">${r.title}</div>
+    ${r.partner ? `<div class="redeem-partner">Parceria com ${r.partnerName}</div>` : ``}
+    <div class="redeem-desc">${r.desc}</div>
+    <div class="redeem-cost-row">
+      <span>Custo</span>
+      <b>${r.pts} pts</b>
+    </div>
+    <div class="redeem-cost-row">
+      <span>Seu saldo de pontos</span>
+      <b>${saldo} pts</b>
+    </div>
+    ${enough
+      ? `<button class="next-btn" onclick="confirmRedeem()">Resgatar por ${r.pts} pts</button>`
+      : `<button class="next-btn" disabled>Pontos insuficientes</button>
+         <div class="redeem-missing">Faltam ${r.pts - saldo} pts pra essa recompensa</div>`
+    }
+  `;
+  document.getElementById('redeemOverlay').classList.add('open');
+}
+
+function closeRedeem(){
+  document.getElementById('redeemOverlay').classList.remove('open');
+}
+
+function confirmRedeem(){
+  const r = rewards[currentRedeemId];
+  const saldoEl = document.getElementById('saldoValue');
+  const saldo = parseInt(saldoEl.textContent, 10);
+  saldoEl.textContent = saldo - r.pts;
+
+  const modal = document.getElementById('redeemModalContent');
+  modal.innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="quiz-header">
+      <h3>Resgate confirmado</h3>
+      <button class="close-btn" onclick="closeRedeem()">✕</button>
+    </div>
+    <div class="result-wrap">
+      <div class="result-emoji">✅</div>
+      <div class="result-title">Resgate concluído!</div>
+      <div class="result-sub">${r.title} já está disponível ${r.partner ? 'no seu cupom parceiro' : 'na sua carteira'}. Confira em "Meus resgates".</div>
+      <div class="points-breakdown">
+        <div class="pb-row"><span>Pontos utilizados</span><b>-${r.pts} pts</b></div>
+        <div class="pb-row total"><span>Saldo restante</span><span>${saldo - r.pts} pts</span></div>
+      </div>
+    </div>
+    <button class="next-btn" onclick="finishRedeem()">Concluir resgate</button>
+  `;
+}
+
+function finishRedeem(){
+  closeRedeem();
+  closeRewardsScreen();
+  const r = rewards[currentRedeemId];
+  showToast(`${r.title} resgatado 🎉`);
+}
+
+function openChallengesScreen(){
+  document.getElementById('challengesScreen').classList.add('open');
+}
+function closeChallengesScreen(){
+  document.getElementById('challengesScreen').classList.remove('open');
+}
+
+const cartItems = [
+  {emoji:"👟", name:"Tênis Corrida Pro Air", qty:1, price:399.90},
+  {emoji:"🩳", name:"Short Performance UV", qty:1, price:129.90},
+];
+const PTS_PER_REAL = 50;
+let spointsOn = false;
+
+function cartSubtotal(){
+  return cartItems.reduce((s,i)=>s+i.price*i.qty, 0);
+}
+
+function maxDiscount(){
+  const saldo = parseInt(document.getElementById('saldoValue').textContent, 10);
+  const subtotal = cartSubtotal();
+  const byPoints = saldo / PTS_PER_REAL;
+  return Math.min(byPoints, subtotal);
+}
+
+function openCart(){
+  spointsOn = false;
+  renderCart();
+  document.getElementById('cartScreen').classList.add('open');
+}
+function closeCart(){
+  document.getElementById('cartScreen').classList.remove('open');
+}
+
+function renderCart(){
+  const subtotal = cartSubtotal();
+  const saldo = parseInt(document.getElementById('saldoValue').textContent, 10);
+  const discount = spointsOn ? maxDiscount() : 0;
+  const pointsUsed = Math.round(discount * PTS_PER_REAL);
+  const total = subtotal - discount;
+
+  const itemsHTML = cartItems.map(i => `
+    <div class="cart-item">
+      <div class="cart-item-img">${i.emoji}</div>
+      <div class="cart-item-info"><h5>${i.name}</h5><span>Qtd: ${i.qty}</span></div>
+      <div class="cart-item-price">R$ ${i.price.toFixed(2).replace('.',',')}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('cartBody').innerHTML = `
+    ${itemsHTML}
+    <div class="spoints-toggle-box">
+      <div class="spoints-toggle-text">
+        <h5>Usar meus Spoints no checkout</h5>
+        <p>Você tem ${saldo} pts (até R$ ${maxDiscount().toFixed(2).replace('.',',')} de desconto)</p>
+      </div>
+      <div class="toggle-switch ${spointsOn ? 'on' : ''}" onclick="toggleSpoints()">
+        <div class="toggle-knob"></div>
+      </div>
+    </div>
+    <div class="cart-summary">
+      <div class="cart-summary-row"><span>Subtotal</span><span>R$ ${subtotal.toFixed(2).replace('.',',')}</span></div>
+      ${spointsOn ? `<div class="cart-summary-row discount"><span>Desconto Spoints (-${pointsUsed} pts)</span><span>-R$ ${discount.toFixed(2).replace('.',',')}</span></div>` : ``}
+      <div class="cart-summary-row total"><span>Total</span><span>R$ ${total.toFixed(2).replace('.',',')}</span></div>
+    </div>
+    <button class="checkout-btn" onclick="finalizeCheckout()">Finalizar compra</button>
+  `;
+}
+
+function toggleSpoints(){
+  spointsOn = !spointsOn;
+  renderCart();
+}
+
+let cartMissionDone = false;
+
+function finalizeCheckout(){
+  const subtotal = cartSubtotal();
+  const discount = spointsOn ? maxDiscount() : 0;
+  const pointsUsed = Math.round(discount * PTS_PER_REAL);
+  const total = subtotal - discount;
+  const missionBonus = cartMissionDone ? 0 : 5;
+  const earnedFromPurchase = Math.round(total);
+
+  const saldoEl = document.getElementById('saldoValue');
+  const saldo = parseInt(saldoEl.textContent, 10);
+  const newSaldo = saldo - pointsUsed + missionBonus + earnedFromPurchase;
+  saldoEl.textContent = newSaldo;
+  cartMissionDone = true;
+
+  const modal = document.getElementById('checkoutModalContent');
+  modal.innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="quiz-header">
+      <h3>Pedido confirmado</h3>
+      <button class="close-btn" onclick="closeCheckoutModal()">✕</button>
+    </div>
+    <div class="result-wrap">
+      <div class="result-emoji">🎉</div>
+      <div class="result-title">Compra finalizada!</div>
+      <div class="result-sub">Seu pedido foi confirmado. ${missionBonus > 0 ? 'Você também completou a missão do carrinho abandonado.' : ''}</div>
+
+      <div class="coin-banner">
+        <div class="coin-emoji">🪙</div>
+        <div class="coin-text">
+          <b>Parabéns!</b><br>Você ganhou ${earnedFromPurchase} pontos por essa compra
+        </div>
+      </div>
+
+      <div class="points-breakdown">
+        <div class="pb-row"><span>Total pago</span><b>R$ ${total.toFixed(2).replace('.',',')}</b></div>
+        ${pointsUsed > 0 ? `<div class="pb-row"><span>Spoints usados no desconto</span><b>-${pointsUsed} pts</b></div>` : ``}
+        <div class="pb-row"><span>Pontos ganhos pela compra (1 pt/R$)</span><b>+${earnedFromPurchase} pts</b></div>
+        ${missionBonus > 0 ? `<div class="pb-row"><span>Bônus por completar missão</span><b>+${missionBonus} pts</b></div>` : ``}
+        <div class="pb-row total"><span>Saldo atual</span><span>${newSaldo} pts</span></div>
+      </div>
+    </div>
+    <button class="next-btn" onclick="finishCheckout()">Concluir</button>
+  `;
+  document.getElementById('checkoutOverlay').classList.add('open');
+}
+
+function closeCheckoutModal(){
+  document.getElementById('checkoutOverlay').classList.remove('open');
+}
+
+function finishCheckout(){
+  closeCheckoutModal();
+  closeCart();
+  showToast("Compra finalizada 🎉");
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+</script>
+
+</body>
+</html>
